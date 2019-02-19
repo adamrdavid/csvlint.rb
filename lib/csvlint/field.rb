@@ -21,6 +21,7 @@ module Csvlint
       end
       validate_length(value, row, column)
       validate_values(value, row, column)
+      validate_enum(value, row, column)
       parsed = validate_type(value, row, column)
       validate_range(parsed, row, column) if parsed != nil
       return valid?
@@ -74,6 +75,12 @@ module Csvlint
             @uniques << value
           end
         end
+      end
+
+      def validate_enum(value, row, column)
+        return unless constraints["enum"]
+
+        build_errors(:enum, :schema, row, column, value) unless value.in? constraints["enum"]
       end
 
       def validate_type(value, row, column)
